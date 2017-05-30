@@ -45,5 +45,18 @@ MongoClient.connect('mongodb://localhost:27017/Todos', (err, db) => {
       console.log('Todos by ID:', JSON.stringify(todos, undefined, 2));
     });
 
+  db.collection('Todos').deleteMany({ text: "todo nodejs" })
+    .then((data) => {
+      console.log('Result:', data.result);
+    });
+  db.collection('Todos').deleteOne({ text: "Pray to God" })
+    .then((data) => {
+      console.log('Result:', data.result);
+    });
+
+  db.collection('Todos').findOneAndDelete({ text: "todo nodejs" })
+    .then((data) => {
+      console.log('Deleted Record:', data.value);
+    });
   // db.close();
 })
