@@ -11,10 +11,8 @@ app.use(bodyParser.json());
 app.post('/todos', (req, res) => {
   var newTodo = new Todo(req.body);
   newTodo.save().then((doc) => {
-    console.log('Todo Created: ', doc);
     res.status(201).send({ id: doc._id });
   }, (err) => {
-    console.log('Unable to Save Todo', err);
     res.status(400).send(err);
   });
 });
@@ -42,3 +40,5 @@ app.listen(3000, () => {
 // }, (err) => {
 //   console.log('Error saving User:', err);
 // });
+
+module.exports = app;
