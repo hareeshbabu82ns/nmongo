@@ -45,18 +45,31 @@ MongoClient.connect('mongodb://localhost:27017/Todos', (err, db) => {
       console.log('Todos by ID:', JSON.stringify(todos, undefined, 2));
     });
 
-  db.collection('Todos').deleteMany({ text: "todo nodejs" })
-    .then((data) => {
-      console.log('Result:', data.result);
-    });
-  db.collection('Todos').deleteOne({ text: "Pray to God" })
-    .then((data) => {
-      console.log('Result:', data.result);
+  // db.collection('Todos').deleteMany({ text: "todo nodejs" })
+  //   .then((data) => {
+  //     console.log('Result:', data.result);
+  //   });
+  // db.collection('Todos').deleteOne({ text: "Pray to God" })
+  //   .then((data) => {
+  //     console.log('Result:', data.result);
+  //   });
+
+  // db.collection('Todos').findOneAndDelete({ text: "todo nodejs" })
+  //   .then((data) => {
+  //     console.log('Deleted Record:', data.value);
+  //   });
+
+  db.collection('Todos')
+    .findOneAndUpdate({ _id: new ObjectID("592c18db14c0f11543e55812") },
+    {
+      $set: {
+        completed: false
+      }
+    }, {
+      returnOriginal: false
+    }).then((data) => {
+      console.log('Updated Document: ', data);
     });
 
-  db.collection('Todos').findOneAndDelete({ text: "todo nodejs" })
-    .then((data) => {
-      console.log('Deleted Record:', data.value);
-    });
   // db.close();
 })
