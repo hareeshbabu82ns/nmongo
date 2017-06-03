@@ -1,4 +1,6 @@
 require('./config/config');
+
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb');
@@ -7,7 +9,7 @@ const mongoose = require('./db/mongoose');
 const Todo = require('./db/models/todo');
 const User = require('./db/models/user');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 var app = express();
 app.use(bodyParser.json());
@@ -29,6 +31,21 @@ app.get('/todos', (req, res) => {
   });
 });
 
+app.delete('/todos/:id', (req, res) => {
+  var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({ message: "ID not Valid" });
+  }
+  Todo.findByIdAndRemove(id).then((todo) => {
+    if (!todo) {
+      return res.status(404).send({ message: 'Object Not Found' });
+    }
+    res.status(200).send({ todo });
+  }).catch((e) => {
+    res.status(400).send(e);
+  });
+});
+
 app.get('/todos/:id', (req, res) => {
   var id = req.params.id;
   if (!ObjectID.isValid(id)) {
@@ -42,6 +59,34 @@ app.get('/todos/:id', (req, res) => {
   }).catch((e) => {
     res.status(400).send(e);
   });
+});
+
+app.patch('/todos/:id', (req, res) => {
+  const id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({ message: "ID not Valid" });
+  }
+  //fetch only properties that are allowed to update by user
+  const obj = _.pick(req.body, ['text', 'completed']);
+
+  //compute completedAt property for TODO
+  if (_.isBoolean(obj.completed) && obj.completed) {
+    obj.completedAt = new Date().getTime();
+  } else {
+    obj.completed = false;
+    obj.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, { $set: obj }, { new: true })
+    .then((todo) => {
+      if (!todo) {
+        return res.status(404).send({ message: 'Object Not Found' });
+      }
+      res.status(200).send({ todo });
+    }).catch((e) => {
+      res.status(404).send(e);
+    });
+
 });
 
 //start the server
